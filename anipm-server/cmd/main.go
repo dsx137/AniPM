@@ -49,7 +49,7 @@ func initRouter(r *gin.Engine, clientFS embed.FS) {
 	}
 }
 
-func Main(clientFS *embed.FS) {
+func Main(clientFS embed.FS) {
 	if mode := os.Getenv("GIN_MODE"); mode == "" {
 		gin.SetMode(gin.ReleaseMode)
 	} else {
@@ -58,7 +58,7 @@ func Main(clientFS *embed.FS) {
 
 	r := gin.Default()
 
-	initRouter(r, *clientFS)
+	initRouter(r, clientFS)
 
 	r.Run(":8080")
 }

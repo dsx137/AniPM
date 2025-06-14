@@ -6,9 +6,9 @@ import (
 	"github.com/dsx137/anipm/anipm-server/cmd"
 )
 
-//go:embed anipm-client/dist/*
+//go:embed all:anipm-client/dist/*
 var clientFS embed.FS
 
 func main() {
-	cmd.Main(&clientFS)
+	cmd.Main(clientFS)
 }
