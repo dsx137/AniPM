@@ -13,7 +13,9 @@ import (
 	"github.com/dsx137/anipm/anipm-server/pkg/app/pojo"
 	"github.com/dsx137/anipm/anipm-server/pkg/app/repository"
 	"github.com/dsx137/anipm/anipm-server/pkg/app/service"
+	_ "github.com/dsx137/anipm/anipm-server/pkg/logging"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func initRouter(r *gin.Engine, clientFS embed.FS) {
@@ -60,5 +62,8 @@ func Main(clientFS embed.FS) {
 
 	initRouter(r, clientFS)
 
-	r.Run(":8080")
+	addr := ":8080"
+
+	logrus.Infof("Listening on %s", addr)
+	r.Run(addr)
 }
