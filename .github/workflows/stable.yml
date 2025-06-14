@@ -1,4 +1,4 @@
-name: snapshot
+name: stable
 
 on:
   push:
@@ -11,47 +11,23 @@ on:
 jobs:
   publish:
     concurrency:
-      group: snapshot
+      group: stable
       cancel-in-progress: true
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
 
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: "pnpm"
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
-
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Install Build Dependencies
+      - name: Create Version
         run: |
-          sudo apt-get update
-          sudo apt-get install -y make upx
-          VERSION="$(<VERSION)"
+          VERSION="snapshot"
           git tag -d "$VERSION" | true
           git tag "$VERSION" | true
           git push origin "$VERSION" --force | true
 
       - name: Build Client
         run: |
-          npm install -g pnpm
           pnpm -C ./anipm-client i
           pnpm -C ./anipm-client run build
 

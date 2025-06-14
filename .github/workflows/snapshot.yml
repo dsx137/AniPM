@@ -16,42 +16,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-          cache: "pnpm"
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: stable
-
-      - name: Cache Go modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Install Build Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y make upx
-          VERSION="snapshot"
-          git tag -d "$VERSION" | true
-          git tag "$VERSION" | true
-          git push origin "$VERSION" --force | true
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
 
       - name: Build Client
         run: |
-          npm install -g pnpm
           pnpm -C ./anipm-client i
           pnpm -C ./anipm-client run build
 
@@ -60,6 +29,19 @@ jobs:
         with:
           distribution: goreleaser
           version: "~> v2"
-          args: release --clean
+          args: release --clean --snapshot
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Snapshot Release
+        uses: andelf/nightly-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: snapshot
+          name: snapshot-$$-${{ github.run_id }}
+          prerelease: true
+          body: ${{ github.event.head_commit.message }}
+          files: |
+            ./dist/*.tar.gz
+            ./dist/*.tar.gz.sha256

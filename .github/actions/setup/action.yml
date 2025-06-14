@@ -1,0 +1,33 @@
+name: "setup"
+description: "setup"
+runs:
+  using: "composite"
+  steps:
+    - uses: pnpm/action-setup@v2
+      with:
+        version: latest
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: "pnpm"
+        cache-dependency-path: "**/pnpm-lock.yaml"
+
+    - uses: actions/setup-go@v5
+      with:
+        go-version: stable
+
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Install Build Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y make upx
+      shell: bash
