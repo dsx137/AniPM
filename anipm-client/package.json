@@ -1,0 +1,28 @@
+{
+  "name": "anipm-client",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "element-plus": "^2.10.1",
+    "lodash.throttle": "^4.1.1",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1",
+    "vue-virtual-scroll-list": "^2.3.5",
+    "vue-virtual-scroller": "2.0.0-beta.8",
+    "vue3-virtual-scroll-list": "^0.2.1"
+  },
+  "devDependencies": {
+    "@types/lodash.throttle": "^4.1.9",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vue/tsconfig": "^0.7.0",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.5",
+    "vue-tsc": "^2.2.8"
+  }
+}

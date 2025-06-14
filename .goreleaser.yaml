@@ -1,0 +1,36 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+      - GIN_MODE=release
+    id: "anipm"
+    binary: anipm
+    main: ./main.go
+    targets:
+      - windows_amd64_v1
+      - linux_amd64_v1
+      - darwin_arm64
+upx:
+  - enabled: true
+    goos: [windows, linux]
+    compress: best
+    lzma: true
+archives:
+  - files:
+      - LICENSE
+      - README.md
+      - templates/*
+      - VERSION
+    format: tar.gz
+    name_template: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+release:
+  replace_existing_artifacts: true
+  prerelease: auto
+  mode: replace
+checksum:
+  split: true
