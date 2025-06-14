@@ -11,6 +11,10 @@ builds:
     id: "anipm"
     binary: anipm
     main: ./main.go
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
     targets:
       - windows_amd64
       - linux_amd64

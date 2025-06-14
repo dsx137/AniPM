@@ -1,14 +1,38 @@
 package util
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 )
 
 var compileRoot string
+var moduleName string
 
+func getModuleName() (string, error) {
+	file, err := os.Open("go.mod")
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	if scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "module") {
+			return strings.TrimSpace(strings.TrimPrefix(line, "module")), nil
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+
+	return "", nil // 如果没有找到 "module" 行，则返回空字符串
+}
 func getCompileRoot() (string, error) {
 	// 对于编译后的二进制文件，go.mod 的位置是固定的。
 	// 也就是说，这个函数查找的是编译时 go.mod 所在的目录。
@@ -52,17 +76,7 @@ func getCompileRoot() (string, error) {
 		currentDir = parentDir
 	}
 
-	// 如果没有找到 go.mod，则回退到可执行文件所在的目录 (os.Executable)
-	// 这个回退在开发时可能意味着 go.mod 缺失，在部署时则意味着你没用 go.mod
-	// 或者是一个编译时路径与部署路径严重不符的情况。
-	// 对于标准 Go Modules 项目，它应该总是找到 go.mod
-	exePath, err := os.Executable()
-	if err != nil {
-		return "", fmt.Errorf("go.mod not found and failed to get executable path: %w", err)
-	}
-	exeDir := filepath.Dir(exePath)
-	fmt.Printf("Warning: go.mod not found by Caller(0) path. Falling back to executable directory: %s\n", exeDir)
-	return exeDir, nil
+	return "", nil
 }
 
 func GetRelativePath(fullPath string) string {
@@ -77,9 +91,9 @@ func GetRelativePath(fullPath string) string {
 }
 
 func init() {
-	_compileRoot, err := getCompileRoot()
+	var err error
+	compileRoot, err = getCompileRoot()
 	if err != nil {
 		panic(err)
 	}
-	compileRoot = _compileRoot
 }
