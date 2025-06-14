@@ -12,8 +12,8 @@ builds:
     binary: anipm
     main: ./main.go
     targets:
-      - windows_amd64_v1
-      - linux_amd64_v1
+      - windows_amd64
+      - linux_amd64
       - darwin_arm64
 upx:
   - enabled: true
@@ -27,7 +27,12 @@ archives:
       - templates/*
       - VERSION
     format: tar.gz
-    name_template: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    name_template: |
+      {{- if .IsSnapshot -}}
+        {{ .Binary }}_snapshot_{{ .Os }}_{{ .Arch }}_{{ .ShortCommit }}
+      {{- else -}}
+        {{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}
+      {{- end -}}
 release:
   replace_existing_artifacts: true
   prerelease: auto
